@@ -1,275 +1,197 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>골밀도 결과 계산기</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
-      background: #f6f7f9;
-      color: #111827;
-    }
-    .wrap {
-      width: 100%;
-      max-width: 430px;
-      margin: 0 auto;
-      padding: 18px 14px 28px;
-    }
-    h1 {
-      margin: 8px 0 4px;
-      text-align: center;
-      font-size: 24px;
-      line-height: 1.25;
-    }
-    .sub {
-      margin: 0 0 16px;
-      text-align: center;
-      color: #6b7280;
-      font-size: 13px;
-    }
-    .card {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 18px;
-      padding: 14px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-      margin-bottom: 14px;
-    }
-
-    /* L1/L2/L3/L4 완전 1열 세로 배치 */
-    .input-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .input-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-    }
-    .input-row label {
-      width: 42px;
-      flex: 0 0 42px;
-      font-size: 17px;
-      font-weight: 800;
-    }
-    .input-row input {
-      flex: 1;
-      width: 100%;
-      height: 48px;
-      border: 1px solid #d1d5db;
-      border-radius: 14px;
-      padding: 0 14px;
-      font-size: 20px;
-      font-weight: 700;
-      outline: none;
-      background: #fff;
-    }
-    .input-row input:focus {
-      border-color: #111827;
-      box-shadow: 0 0 0 3px rgba(17,24,39,0.08);
-    }
-    button {
-      width: 100%;
-      height: 46px;
-      border: 1px solid #d1d5db;
-      border-radius: 14px;
-      background: #fff;
-      font-size: 15px;
-      font-weight: 700;
-      margin-top: 12px;
-    }
-    .final {
-      background: #111827;
-      color: #fff;
-      border-radius: 16px;
-      padding: 15px;
-      margin-bottom: 14px;
-    }
-    .final .label {
-      color: #d1d5db;
-      font-size: 12px;
-      margin-bottom: 5px;
-    }
-    .final .value {
-      font-size: 21px;
-      font-weight: 900;
-      line-height: 1.25;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: 900;
-      margin: 14px 0 8px;
-    }
-    .mini-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .pill {
-      background: #f3f4f6;
-      border-radius: 13px;
-      padding: 10px 12px;
-      font-size: 14px;
-      line-height: 1.35;
-    }
-    .pill b { font-weight: 900; }
-    .empty {
-      background: #f3f4f6;
-      border-radius: 14px;
-      padding: 18px 12px;
-      text-align: center;
-      color: #6b7280;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .foot {
-      padding: 0 6px;
-      color: #9ca3af;
-      text-align: center;
-      font-size: 12px;
-      line-height: 1.45;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>골밀도 계산기</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;background:#f3f4f6;margin:0;padding:20px;color:#111827;}
+.wrap{max-width:420px;margin:auto;}
+h1{text-align:center;font-size:28px;margin:0 0 6px;font-weight:900;}
+.sub{text-align:center;color:#6b7280;margin-bottom:18px;font-size:13px;}
+.card{background:white;border-radius:20px;padding:16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+.row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.label{width:42px;font-weight:900;font-size:20px;}
+input{flex:1;height:52px;border-radius:14px;border:1px solid #d1d5db;padding:0 14px;font-size:22px;font-weight:800;}
+button{width:100%;height:46px;border-radius:14px;border:1px solid #d1d5db;background:white;font-size:16px;font-weight:800;margin-top:4px;}
+.result{background:#111827;color:white;border-radius:16px;padding:16px;margin-bottom:14px;}
+.result-error{background:#dc2626;color:white;border-radius:16px;padding:16px;margin-bottom:14px;}
+.sec{margin-top:14px;}
+.sec-title{font-weight:900;margin-bottom:8px;}
+.pill{background:#f3f4f6;border-radius:12px;padding:10px;margin-bottom:8px;}
+.warn{background:#fff1f2;}
+.ok{background:#ecfdf5;}
+.empty{text-align:center;color:#6b7280;padding:20px;line-height:1.5;}
+.small{font-size:12px;color:#6b7280;margin-top:4px;}
+</style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>골밀도 결과 계산</h1>
-    <p class="sub">L1~L4 T-score 입력 후 최종 결과 확인</p>
+<div class="wrap">
+<h1>골밀도 결과 계산</h1>
+<div class="sub">L1~L4 T-score 입력 후 최종 결과 확인</div>
 
-    <section class="card">
-      <div class="input-list" id="inputList">
-        <div class="input-row">
-          <label for="L1">L1</label>
-          <input id="L1" type="number" step="0.1" inputmode="decimal" placeholder="예: -0.8" autocomplete="off">
-        </div>
-        <div class="input-row">
-          <label for="L2">L2</label>
-          <input id="L2" type="number" step="0.1" inputmode="decimal" placeholder="예: -1.5" autocomplete="off">
-        </div>
-        <div class="input-row">
-          <label for="L3">L3</label>
-          <input id="L3" type="number" step="0.1" inputmode="decimal" placeholder="예: -0.8" autocomplete="off">
-        </div>
-        <div class="input-row">
-          <label for="L4">L4</label>
-          <input id="L4" type="number" step="0.1" inputmode="decimal" placeholder="예: 0.9" autocomplete="off">
-        </div>
-      </div>
-      <button type="button" onclick="resetAll()">초기화</button>
-    </section>
+<div class="card">
+  <div class="row"><div class="label">L1</div><input id="L1" type="number" step="0.1" inputmode="decimal"></div>
+  <div class="row"><div class="label">L2</div><input id="L2" type="number" step="0.1" inputmode="decimal"></div>
+  <div class="row"><div class="label">L3</div><input id="L3" type="number" step="0.1" inputmode="decimal"></div>
+  <div class="row"><div class="label">L4</div><input id="L4" type="number" step="0.1" inputmode="decimal"></div>
+  <button onclick="resetAll()">초기화</button>
+</div>
 
-    <section class="card" id="resultBox">
-      <div class="empty">L1, L2, L3, L4 값을 모두 입력하면 결과가 표시됩니다.</div>
-    </section>
+<div class="card" id="output">
+  <div class="empty">L1, L2, L3, L4 값을 모두 입력하면 결과가 표시됩니다.</div>
+</div>
+</div>
 
-    <p class="foot">기준: 인접 vertebra T-score 차이 1.0 이상이면 높은 값을 제외 후 재비교합니다.</p>
-  </main>
+<script>
+const ids = ["L1","L2","L3","L4"];
 
-  <script>
-    const ids = ["L1", "L2", "L3", "L4"];
+ids.forEach((id,idx)=>{
+  const el=document.getElementById(id);
+  el.addEventListener("keydown",(e)=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      if(idx < ids.length-1) document.getElementById(ids[idx+1]).focus();
+      else { calculate(); document.activeElement.blur(); }
+    }
+  });
+  el.addEventListener("input",calculate);
+});
 
-    ids.forEach((id, idx) => {
-      const el = document.getElementById(id);
-      el.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          if (idx < ids.length - 1) {
-            document.getElementById(ids[idx + 1]).focus();
-          } else {
-            calculate();
-            document.getElementById("resultBox").scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }
-      });
-      el.addEventListener("input", calculate);
+function fmt(v){ return v > 0 ? "+" + v.toFixed(1) : v.toFixed(1); }
+
+function resultLabel(active){
+  const nums = active.map(v => Number(v.name.replace("L",""))).sort((a,b)=>a-b);
+  let consecutive = true;
+  for(let i=0;i<nums.length-1;i++){
+    if(nums[i+1] !== nums[i] + 1){ consecutive = false; break; }
+  }
+  if(consecutive){
+    if(nums.length === 1) return "L" + nums[0];
+    return "L" + nums[0] + "-L" + nums[nums.length-1];
+  }
+  return nums.map(n => "L" + n).join(", ");
+}
+
+function compareAdjacent(active){
+  let comparisons = [];
+  let excludeSet = new Set();
+
+  for(let i=0;i<active.length-1;i++){
+    const a = active[i], b = active[i+1];
+    const diff = Math.abs(a.value - b.value);
+    let exclude = null;
+
+    if(diff >= 1.0){
+      exclude = a.value > b.value ? a.name : b.name;
+      excludeSet.add(exclude);
+    }
+
+    comparisons.push({
+      label: a.name + "-" + b.name,
+      diff,
+      exclude
+    });
+  }
+
+  return {comparisons, excludeList:[...excludeSet]};
+}
+
+function calculateProcess(vals){
+  let active = [...vals];
+  let excludedAll = [];
+  let rounds = [];
+
+  while(active.length >= 2){
+    const round = compareAdjacent(active);
+    rounds.push(round);
+
+    if(round.excludeList.length === 0) break;
+
+    excludedAll.push(...round.excludeList);
+    active = active.filter(x => !round.excludeList.includes(x.name));
+  }
+
+  return {active, excludedAll:[...new Set(excludedAll)], rounds};
+}
+
+function calculate(){
+  const vals = ids.map(id=>{
+    const raw=document.getElementById(id).value;
+    return {name:id,value:raw===""?null:Number(raw)};
+  });
+
+  const output=document.getElementById("output");
+  if(vals.some(v=>v.value===null || Number.isNaN(v.value))){
+    output.innerHTML='<div class="empty">L1, L2, L3, L4 값을 모두 입력하면 결과가 표시됩니다.</div>';
+    return;
+  }
+
+  const process = calculateProcess(vals);
+  const active = process.active;
+  const excludedAll = process.excludedAll;
+  const rounds = process.rounds;
+
+  const validResult = active.length >= 2;
+
+  let resultBox = "";
+  if(validResult){
+    const avg=Math.round((active.reduce((s,v)=>s+v.value,0)/active.length)*10)/10;
+    const finalName=resultLabel(active);
+    resultBox = `
+      <div class="result">
+        <div style="font-size:12px;color:#d1d5db;">최종결과</div>
+        <div style="font-size:24px;font-weight:900;margin-top:4px;">${finalName} / T-Score ${fmt(avg)}</div>
+      </div>`;
+  }else{
+    resultBox = `
+      <div class="result-error">
+        <div style="font-size:12px;color:#fee2e2;">최종결과</div>
+        <div style="font-size:23px;font-weight:900;margin-top:4px;">유효항목 2개 미만</div>
+      </div>`;
+  }
+
+  let roundHtml = "";
+
+  rounds.forEach((r,idx)=>{
+    const title = idx === 0 ? "1. 인접 차이" : `${idx+2}. 남은 vertebra 재비교`;
+
+    roundHtml += `<div class="sec"><div class="sec-title">${title}</div>`;
+
+    r.comparisons.forEach(c=>{
+      const isBad = c.diff >= 1.0;
+      roundHtml += `<div class="pill ${isBad ? "warn" : "ok"}">
+        ${c.label} 차이: <b>${c.diff.toFixed(1)}</b> / ${isBad ? c.exclude + " 제외대상" : "인정"}
+      </div>`;
     });
 
-    function fmt(n) {
-      if (n === null || Number.isNaN(n)) return "";
-      return n > 0 ? "+" + n.toFixed(1) : n.toFixed(1);
+    if(r.excludeList.length > 0){
+      roundHtml += `<div class="sec-title">${idx === 0 ? "2. 제외" : "추가 제외"}</div>
+      <div class="pill warn"><b>${r.excludeList.join(", ")} 제외</b></div>`;
+    }else if(idx > 0){
+      roundHtml += `<div class="pill ok"><b>추가 제외 없음</b></div>`;
     }
 
-    function avg(arr) {
-      const sum = arr.reduce((a, b) => a + b.value, 0);
-      return Math.round((sum / arr.length) * 10) / 10;
-    }
+    roundHtml += `</div>`;
+  });
 
-    function getValues() {
-      return ids.map(id => {
-        const raw = document.getElementById(id).value;
-        return { name: id, value: raw === "" ? null : Number(raw) };
-      });
-    }
+  output.innerHTML=`
+    ${resultBox}
 
-    function calculate() {
-      const parsed = getValues();
-      const box = document.getElementById("resultBox");
+    ${roundHtml}
 
-      if (parsed.some(x => x.value === null || Number.isNaN(x.value))) {
-        box.innerHTML = '<div class="empty">L1, L2, L3, L4 값을 모두 입력하면 결과가 표시됩니다.</div>';
-        return;
-      }
+    <div class="sec">
+      <div class="sec-title">최종 제외</div>
+      <div class="pill"><b>${excludedAll.length ? excludedAll.join(", ")+" 제외" : "제외 없음"}</b></div>
+    </div>
+  `;
+}
 
-      let active = [...parsed];
-      const excluded = [];
-
-      while (active.length >= 2) {
-        let changed = false;
-
-        for (let i = 0; i < active.length - 1; i++) {
-          const a = active[i];
-          const b = active[i + 1];
-          const diff = Math.abs(a.value - b.value);
-
-          if (diff >= 1.0) {
-            const remove = a.value > b.value ? a : b;
-            excluded.push(remove.name);
-            active = active.filter(x => x.name !== remove.name);
-            changed = true;
-            break;
-          }
-        }
-
-        if (!changed) break;
-      }
-
-      const finalName = active.map(x => x.name).join("-");
-      const finalScore = avg(active);
-      const diffs = [
-        { label: "L1-L2", value: Math.abs(parsed[0].value - parsed[1].value) },
-        { label: "L2-L3", value: Math.abs(parsed[1].value - parsed[2].value) },
-        { label: "L3-L4", value: Math.abs(parsed[2].value - parsed[3].value) },
-      ];
-
-      box.innerHTML = `
-        <div class="final">
-          <div class="label">최종결과</div>
-          <div class="value">${finalName} / T-Score ${fmt(finalScore)}</div>
-        </div>
-
-        <div class="section-title">1. 개별 T-Score</div>
-        <div class="mini-grid">
-          ${parsed.map(x => `<div class="pill"><b>${x.name}:</b> ${fmt(x.value)}</div>`).join("")}
-        </div>
-
-        <div class="section-title">2. 인접 차이</div>
-        ${diffs.map(d => `<div class="pill" style="margin-bottom:8px;">${d.label} 차이: <b>${d.value.toFixed(1)}</b></div>`).join("")}
-
-        <div class="section-title">3. 제외</div>
-        <div class="pill"><b>${excluded.length ? excluded.join(", ") + " 제외" : "제외 없음"}</b></div>
-      `;
-    }
-
-    function resetAll() {
-      ids.forEach(id => document.getElementById(id).value = "");
-      document.getElementById("L1").focus();
-      calculate();
-    }
-  </script>
+function resetAll(){
+  ids.forEach(id=>document.getElementById(id).value="");
+  document.getElementById("L1").focus();
+  calculate();
+}
+</script>
 </body>
 </html>
